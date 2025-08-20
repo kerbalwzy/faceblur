@@ -1,0 +1,14 @@
+--extra-index-url https://download.pytorch.org/whl/cu118
+
+colorlog==6.9.0
+numpy==1.26.4
+onnx==1.18.0
+onnxruntime-gpu==1.16.0
+opencv-python==4.10.0.84
+opencv-python-headless==4.11.0.86
+torch==2.6.0+cu118; platform_system == "Windows"
+torchaudio==2.6.0+cu118; platform_system == "Windows"
+torchinfo==1.8.0; platform_system == "Windows"
+torchvision==0.21.0+cu118; platform_system == "Windows"
+insightface==0.7.3 
+av==14.3.0
