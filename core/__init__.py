@@ -9,7 +9,7 @@ logger.handlers.clear()
 color_handler = logging.StreamHandler(sys.stdout)
 color_handler.setFormatter(
     colorlog.ColoredFormatter(
-        "%(log_color)s%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d %(name)s\t%(message)s",
+        "%(log_color)s%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d \t%(message)s",
         datefmt="%x %X",
         log_colors={
             "DEBUG": "cyan",

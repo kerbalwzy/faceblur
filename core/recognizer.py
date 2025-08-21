@@ -4,6 +4,7 @@ import numpy as np
 import onnxruntime as ort
 from typing import List
 from insightface.app import FaceAnalysis
+from .consts import PROJECT_DIR
 
 logger = logging.getLogger("faceblur")
 
@@ -25,6 +26,7 @@ class FaceRecognizer:
         )
         self.app = FaceAnalysis(
             name="buffalo_l",
+            root=PROJECT_DIR,
             allowed_modules=["detection", "recognition"],
             providers=self.providers,
         )
