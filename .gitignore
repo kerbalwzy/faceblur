@@ -210,3 +210,4 @@ __marimo__/
 test.py
 *_blurred.*
 models/
+.DS_Store

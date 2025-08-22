@@ -3,7 +3,7 @@ colorlog==6.9.0
 numpy==1.26.4
 opencv-python-headless==4.11.0.86
 onnx==1.18.0
-onnxruntime-silicon==1.13.1; sys_platform == "darwin"
+onnxruntime==1.22.1; sys_platform == "darwin"
 onnxruntime-gpu==1.16.0; platform_system == "windows"
 insightface==0.7.3 
 av==14.3.0

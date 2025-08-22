@@ -65,6 +65,8 @@ class FaceRecognizer:
                 det_size=det_size,
             )
         self.sim_thresh = sim_thresh
+        dummy_frame = np.zeros((det_size[1], det_size[0], 3), dtype=np.uint8)
+        self.app.get(dummy_frame)
         logger.info("FaceRecognizer prepare done")
 
     def set_faceignore(self, face_images: List[str]):
@@ -83,7 +85,9 @@ class FaceRecognizer:
                 continue
             for face in faces:
                 self.faceignore_normed_embs.append(face.normed_embedding)
-        logger.debug(f"set_faceignore done, ignore_faces={len(self.faceignore_normed_embs)}")
+        logger.debug(
+            f"set_faceignore done, ignore_faces={len(self.faceignore_normed_embs)}"
+        )
 
     def is_ignore_face(self, normed_emb: np.ndarray) -> bool:
         """
@@ -103,12 +107,7 @@ class FaceRecognizer:
         :params frame: video frame
         :return: res
         [
-            {
-                "face_normed_emb": face.normed_embedding,
-                "face_position": (x1, y1, x2, y2),
-                "face_region": <np.ndarray>,
-                "frame_idx": frame_idx,
-            },
+            (x1, y1, x2, y2),
             ...
         ]
         """
