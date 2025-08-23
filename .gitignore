@@ -211,3 +211,4 @@ test.py
 *_blurred.*
 models/
 .DS_Store
+settings.json
