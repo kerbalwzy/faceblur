@@ -207,8 +207,10 @@ marimo/_lsp/
 __marimo__/
 
 # Custom
-test.py
-*_blurred.*
 models/
+static/
+
+test*.*
+*_blurred.*
 .DS_Store
 settings.json

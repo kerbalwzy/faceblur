@@ -9,3 +9,6 @@ insightface==0.7.3
 av==14.3.0
 pywebview==6.0
 pystray==0.19.5
+eventlet==0.40.2
+Flask==3.1.2
+Flask-SocketIO==5.5.1

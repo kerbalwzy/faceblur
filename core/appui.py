@@ -3,7 +3,11 @@ import sys
 import pystray
 import webview
 from PIL import Image, ImageDraw
+
+from .consts import STATIC_INDEX, ICON_PATH
 from .i18n import t
+
+__all__ = ["appui"]
 
 
 logger = logging.getLogger("faceblur")
@@ -40,6 +44,8 @@ class AppUI:
             js_api=js_api,
         )
         self.__create_systray(title=title, icon=icon)
+        logger.debug(f"appui initted")
+
 
     def __create_window(
         self, title: str, url: str, width: int, height: int, js_api: object
@@ -91,9 +97,14 @@ class AppUI:
         self.window.show()
 
     def on_exit(self):
-        self.window.destroy()
-        self.systray.stop()
-        sys.exit(0)
+        try:
+            while webview.windows:
+                for window in webview.windows:
+                    window.destroy()
+            self.systray.stop()
+            sys.exit(0)
+        except:
+            pass
 
     def update_systray_language(self):
         self.systray.menu = pystray.Menu(
@@ -101,6 +112,8 @@ class AppUI:
             pystray.MenuItem(t("label.Quite"), self.on_exit),
         )
 
-    def run(self, debug: bool = False):
+    def run(self, func=None, debug: bool = False):
         self.systray.run_detached()
-        webview.start(debug=debug)
+        webview.start(func=func,debug=debug)
+
+appui = AppUI(url=STATIC_INDEX, icon=ICON_PATH)
