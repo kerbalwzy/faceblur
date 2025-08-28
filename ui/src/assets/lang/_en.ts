@@ -2,8 +2,9 @@ export const en = {
   label: {
     Setting: "Settings",
     Remove: "Remove",
-    ClickToSelectInputVideo: "Click here to select a video",
-    ClickToAddIgnoreFace: "Click here to add ignore faces",
+    ClickHere:"Click here",
+    SelectSourceVideo: "Select source video",
+    AddIgnoreFace: "Add ignore face",
   },
   msg: {
     Required: "Required",
