@@ -44,11 +44,9 @@ class SocketService {
     return this.socket;
   }
 
-  public sendMessage(message: string): void {
-    if (this.socket && this.socket.connected) {
-      this.socket.emit("message", message);
-    } else {
-      console.error("SocketIO not connected");
+  public emit(event: any, data: any): void {
+    if (this.socket) {
+      this.socket.emit(event, data);
     }
   }
 

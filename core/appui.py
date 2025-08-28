@@ -1,6 +1,6 @@
 import logging
-import sys
 import pystray
+import sys
 import webview
 from PIL import Image, ImageDraw
 
@@ -15,7 +15,7 @@ logger = logging.getLogger("faceblur")
 
 def hide_replace_of_close(window: webview.Window):
     def func():
-        if window.hidden:
+        if getattr(window, "systray_quite", False):
             return True
         window.hidden = True
         window.hide()
@@ -45,7 +45,6 @@ class AppUI:
         )
         self.__create_systray(title=title, icon=icon)
         logger.debug(f"appui initted")
-
 
     def __create_window(
         self, title: str, url: str, width: int, height: int, js_api: object
@@ -87,33 +86,40 @@ class AppUI:
         else:
             systray = pystray.Icon(name=title, icon=iconImg, title=title)
         systray.menu = pystray.Menu(
-            pystray.MenuItem(t("label.ShowWindow"), self.on_show_window),
-            pystray.MenuItem(t("label.Quite"), self.on_exit),
+            pystray.MenuItem(t("label.ShowWindow"), self.show_window),
+            pystray.MenuItem(t("label.Quite"), self.quite),
         )
         self.systray = systray
 
-    def on_show_window(self):
+    def show_window(self):
         self.window.hidden = False
         self.window.show()
+        logger.debug(f"show window {self.window.title}")
 
-    def on_exit(self):
+    def quite(self):
         try:
-            while webview.windows:
-                for window in webview.windows:
-                    window.destroy()
+            setattr(self.window, "systray_quite", True)
+            self.window.destroy()
             self.systray.stop()
-            sys.exit(0)
+            logger.debug(f"appui quite")
+        except:
+            pass
+        try:
+            exit()
         except:
             pass
 
     def update_systray_language(self):
         self.systray.menu = pystray.Menu(
-            pystray.MenuItem(t("label.ShowWindow"), self.on_show_window),
-            pystray.MenuItem(t("label.Quite"), self.on_exit),
+            pystray.MenuItem(t("label.ShowWindow"), self.show_window),
+            pystray.MenuItem(t("label.Quite"), self.quite),
         )
+        logger.debug(f"update systray language")
 
     def run(self, func=None, debug: bool = False):
         self.systray.run_detached()
-        webview.start(func=func,debug=debug)
+        logger.debug(f"appui run")
+        webview.start(func=func, debug=debug)
+
 
 appui = AppUI(url=STATIC_INDEX, icon=ICON_PATH)

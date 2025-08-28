@@ -7,8 +7,10 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    IgnoreFaces: typeof import('./src/components/IgnoreFaces.vue')['default']
     LanguageBtn: typeof import('./src/components/LanguageBtn.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    VideoInput: typeof import('./src/components/VideoInput.vue')['default']
   }
 }
