@@ -1,3 +1,4 @@
+import os
 import logging
 import pystray
 import sys
@@ -44,7 +45,7 @@ class AppUI:
             js_api=js_api,
         )
         self.__create_systray(title=title, icon=icon)
-        logger.debug(f"appui initted")
+        logger.debug(f"appui inited")
 
     def __create_window(
         self, title: str, url: str, width: int, height: int, js_api: object
@@ -100,12 +101,15 @@ class AppUI:
         try:
             setattr(self.window, "systray_quite", True)
             self.window.destroy()
+            while len(webview.windows) > 0:
+                window = webview.windows.pop()
+                window.destroy()
             self.systray.stop()
-            logger.debug(f"appui quite")
-        except:
-            pass
+        except Exception as e:
+            logger.error(f"appui quite error: {e}")
+        logger.debug(f"appui quite")
         try:
-            exit()
+            os._exit(0)
         except:
             pass
 

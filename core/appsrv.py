@@ -46,3 +46,14 @@ def handle_select_input_video(*args):
         threading.Thread(
             target=prepare_face_recognizer, args=(app,), daemon=True
         ).start()
+
+
+@socketio.on("add_ignore_face")
+def handle_add_ignore_face(*args):
+    file_types = ("Image File (*.jpg;*.jpeg;*.png)",)
+    result = appui.window.create_file_dialog(
+        FileDialog.OPEN, allow_multiple=True, file_types=file_types
+    )
+    logger.debug(f"add_ignore_face: {result}")
+    # Send result to ui
+    socketio.emit("ignore_face_selected", {"result": result and list(result)})
