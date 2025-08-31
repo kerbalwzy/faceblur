@@ -2,7 +2,7 @@
   <v-card>
     <div class="d-flex align-center justify-start">
       <div
-        style="width: 180px;min-width: 180px;"
+        style="width: 180px; min-width: 180px"
         class="d-flex flex-column align-center justify-center pa-8 cursor-pointer elevation-20"
         @click="addIgnoreFace"
       >
@@ -14,6 +14,7 @@
       <div
         ref="ignoreFacesContainer"
         class="d-flex flex-row align-center justify-start ignore-faces"
+        @wheel="handleWheel"
       >
         <div
           v-for="(face, index) in appStore.ignoreFaces"
@@ -43,32 +44,96 @@ const { t } = useI18n();
 
 import SocketService from "@/services/socket";
 import { useAppStore } from "@/stores";
-import { onMounted, onUnmounted, ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 
 const appStore = useAppStore();
 const ignoreFacesContainer = ref<HTMLElement | null>(null);
 
-const handleWheel = (event: WheelEvent) => {
-  if (ignoreFacesContainer.value) {
-    event.preventDefault();
-    ignoreFacesContainer.value.scrollLeft += event.deltaY * 1.2;
+// 检测是否为触摸板事件
+const isTrackpadEvent = (event: WheelEvent): boolean => {
+  const isChrome =
+    /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+
+  if (isChrome) {
+    return (
+      event.deltaMode === 0 &&
+      (Math.abs(event.deltaX) > 0 || Math.abs(event.deltaY) > 0) &&
+      Math.abs(event.deltaX) !== Math.abs(event.deltaY)
+    );
   }
+
+  return (
+    Math.abs(event.deltaX) > 0 ||
+    (event.deltaMode === 0 && Math.abs(event.deltaY) % 1 !== 0)
+  );
+};
+
+// 处理滚轮事件
+const handleWheel = (event: WheelEvent) => {
+  if (!ignoreFacesContainer.value) return;
+
+  event.preventDefault();
+
+  const isTrackpad = isTrackpadEvent(event);
+  const scrollAmount = isTrackpad ? event.deltaX * 1.5 : event.deltaY * 1.2;
+
+  // 直接使用 CSS 的平滑滚动
+  ignoreFacesContainer.value.scrollLeft += scrollAmount;
+};
+
+// 移除未使用的 smoothScrollTo 函数
+
+// 触摸事件处理
+const touchData = ref({
+  startX: 0,
+  scrollLeft: 0,
+  isScrolling: false,
+});
+
+const handleTouchStart = (event: TouchEvent) => {
+  if (!ignoreFacesContainer.value) return;
+
+  const touch = event.touches[0];
+  touchData.value = {
+    startX: touch.clientX,
+    scrollLeft: ignoreFacesContainer.value.scrollLeft,
+    isScrolling: true,
+  };
+};
+
+const handleTouchMove = (event: TouchEvent) => {
+  if (!ignoreFacesContainer.value || !touchData.value.isScrolling) return;
+
+  const touch = event.touches[0];
+  const deltaX = touchData.value.startX - touch.clientX;
+  ignoreFacesContainer.value.scrollLeft = touchData.value.scrollLeft + deltaX;
+
+  event.preventDefault();
+};
+
+const handleTouchEnd = () => {
+  touchData.value.isScrolling = false;
 };
 
 onMounted(() => {
-  if (ignoreFacesContainer.value) {
-    ignoreFacesContainer.value.addEventListener("wheel", handleWheel, {
-      passive: false,
-    });
-  }
+  const container = ignoreFacesContainer.value;
+  if (!container) return;
+
+  container.addEventListener("touchstart", handleTouchStart, { passive: true });
+  container.addEventListener("touchmove", handleTouchMove, { passive: false });
+  container.addEventListener("touchend", handleTouchEnd);
 });
 
 onUnmounted(() => {
-  if (ignoreFacesContainer.value) {
-    ignoreFacesContainer.value.removeEventListener("wheel", handleWheel);
-  }
+  const container = ignoreFacesContainer.value;
+  if (!container) return;
+
+  container.removeEventListener("touchstart", handleTouchStart);
+  container.removeEventListener("touchmove", handleTouchMove);
+  container.removeEventListener("touchend", handleTouchEnd);
 });
 
+// Socket 相关代码保持不变
 SocketService.on("ignore_face_selected", (data) => {
   if (data.result && data.result.length > 0) {
     const res: never[] = data.result;
@@ -88,20 +153,30 @@ const deleteIgnoreFace = (index: number) => {
 <style scoped>
 .delete-btn {
   position: absolute;
-  top: 2px; /* 调整位置，留出一些边距 */
-  left: 2px; /* 调整位置，留出一些边距 */
-  z-index: 10; /* 确保按钮在最上层 */
+  top: 8px;
+  right: 8px;
+  z-index: 10;
 }
 
 .ignore-faces {
   flex-grow: 1;
   height: 160px;
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: hidden;
+  scroll-behavior: smooth; /* 启用 CSS 平滑滚动 */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* 为每个图片容器创建定位上下文 */
 .position-relative {
   position: relative;
 }
+
+/* .ignore-faces {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+} */
+
+/* .ignore-faces::-webkit-scrollbar {
+  display: none;
+} */
 </style>

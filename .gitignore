@@ -214,3 +214,4 @@ test*.*
 *_blurred.*
 .DS_Store
 settings.json
+faceignore_example copy*.jpg
