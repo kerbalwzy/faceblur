@@ -49,41 +49,13 @@ import { ref, onMounted, onUnmounted } from "vue";
 const appStore = useAppStore();
 const ignoreFacesContainer = ref<HTMLElement | null>(null);
 
-// 检测是否为触摸板事件
-const isTrackpadEvent = (event: WheelEvent): boolean => {
-  const isChrome =
-    /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-
-  if (isChrome) {
-    return (
-      event.deltaMode === 0 &&
-      (Math.abs(event.deltaX) > 0 || Math.abs(event.deltaY) > 0) &&
-      Math.abs(event.deltaX) !== Math.abs(event.deltaY)
-    );
-  }
-
-  return (
-    Math.abs(event.deltaX) > 0 ||
-    (event.deltaMode === 0 && Math.abs(event.deltaY) % 1 !== 0)
-  );
-};
-
-// 处理滚轮事件
 const handleWheel = (event: WheelEvent) => {
   if (!ignoreFacesContainer.value) return;
-
   event.preventDefault();
-
-  const isTrackpad = isTrackpadEvent(event);
-  const scrollAmount = isTrackpad ? event.deltaX * 1.5 : event.deltaY * 1.2;
-
-  // 直接使用 CSS 的平滑滚动
-  ignoreFacesContainer.value.scrollLeft += scrollAmount;
+  const scrollDelta = (event.deltaX || event.deltaY) * 1.5;
+  ignoreFacesContainer.value.scrollLeft += scrollDelta;
 };
 
-// 移除未使用的 smoothScrollTo 函数
-
-// 触摸事件处理
 const touchData = ref({
   startX: 0,
   scrollLeft: 0,
@@ -133,7 +105,6 @@ onUnmounted(() => {
   container.removeEventListener("touchend", handleTouchEnd);
 });
 
-// Socket 相关代码保持不变
 SocketService.on("ignore_face_selected", (data) => {
   if (data.result && data.result.length > 0) {
     const res: never[] = data.result;
@@ -171,12 +142,4 @@ const deleteIgnoreFace = (index: number) => {
   position: relative;
 }
 
-/* .ignore-faces {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-} */
-
-/* .ignore-faces::-webkit-scrollbar {
-  display: none;
-} */
 </style>
