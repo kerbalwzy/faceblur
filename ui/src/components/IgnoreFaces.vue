@@ -2,7 +2,7 @@
   <v-card>
     <div class="d-flex align-center justify-start">
       <div
-        style="width: 170px;min-width: 170px;"
+        style="width: 180px;min-width: 180px;"
         class="d-flex flex-column align-center justify-center pa-8 cursor-pointer elevation-20"
         @click="addIgnoreFace"
       >
@@ -89,14 +89,14 @@ const deleteIgnoreFace = (index: number) => {
 .delete-btn {
   position: absolute;
   top: 2px; /* 调整位置，留出一些边距 */
-  right: 2px; /* 调整位置，留出一些边距 */
+  left: 2px; /* 调整位置，留出一些边距 */
   z-index: 10; /* 确保按钮在最上层 */
 }
 
 .ignore-faces {
   flex-grow: 1;
   height: 160px;
-  overflow-x: auto;
+  overflow-x: scroll;
   overflow-y: hidden;
 }
 

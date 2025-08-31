@@ -59,6 +59,6 @@ const resetVideoInputFile = () => {
 .delete-btn {
   position: absolute;
   top: 2px;
-  right: 2px;
+  left: 2px;
 }
 </style>

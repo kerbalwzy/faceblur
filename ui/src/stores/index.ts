@@ -7,9 +7,15 @@ export const useAppStore = defineStore("app", {
   }),
   actions: {
     updateSourceVideo(sourceVideo: string) {
+      if (this.sourceVideo === sourceVideo) {
+        return;
+      }
       this.sourceVideo = sourceVideo;
     },
     addIgnoreFace(filepath: never) {
+      if (this.ignoreFaces.includes(filepath)) {
+        return;
+      }
       this.ignoreFaces.push(filepath);
     },
     delIgnoreFace(index: number) {

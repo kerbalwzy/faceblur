@@ -3,6 +3,7 @@ import av
 import cv2
 from typing import Any, Iterator, Tuple
 from PIL import Image
+import numpy as np
 
 
 class FPSCounter:
@@ -53,6 +54,17 @@ def frame_preview(
     return True
 
 
+def systray_darwin_icon(icon: Image.Image) -> Image.Image:
+    if icon.mode != "RGBA":
+        icon = icon.convert("RGBA")
+    icon = icon.copy()
+    data = np.array(icon)
+    alpha = data[:, :, 3]
+    data[alpha > 0, :3] = [255, 255, 255]
+    icon = Image.fromarray(data)
+    return icon
+
+
 def video_total_duration(video_stream: av.VideoStream) -> float:
     """获取视频总时长（秒）"""
     if video_stream.duration and video_stream.time_base:
@@ -96,11 +108,13 @@ def video_frame_thumbnails(
 
         for time_point in time_points:
             # Seek to the target timestamp
-            container.seek(offset=int(time_point * video_stream.time_base), stream=video_stream)
+            container.seek(
+                offset=int(time_point * video_stream.time_base), stream=video_stream
+            )
             # Decode frames and find the closest one to our target time
             closest_frame = None
             min_time_diff = float("inf")
-            
+
             for frame in container.decode(video_stream):
                 frame_time = float(frame.pts * frame.time_base)
                 time_diff = abs(frame_time - time_point)

@@ -5,6 +5,8 @@ import sys
 import webview
 from PIL import Image, ImageDraw
 
+from core.uitls import systray_darwin_icon
+
 from .consts import STATIC_INDEX, ICON_PATH
 from .i18n import t
 
@@ -17,6 +19,8 @@ logger = logging.getLogger("faceblur")
 def hide_replace_of_close(window: webview.Window):
     def func():
         if getattr(window, "systray_quite", False):
+            return True
+        if window.hidden is True:
             return True
         window.hidden = True
         window.hide()
@@ -78,6 +82,8 @@ class AppUI:
             d.text((10, 10), "FB", fill=(255, 255, 0))
 
         if sys.platform == "darwin":
+            iconImg = systray_darwin_icon(iconImg)
+            #
             from AppKit import NSApplication
 
             ns_app = NSApplication.sharedApplication()
