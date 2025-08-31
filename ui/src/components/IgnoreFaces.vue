@@ -124,8 +124,8 @@ const deleteIgnoreFace = (index: number) => {
 <style scoped>
 .delete-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 2px;
+  left: 2px;
   z-index: 10;
 }
 
@@ -134,12 +134,11 @@ const deleteIgnoreFace = (index: number) => {
   height: 160px;
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-behavior: smooth; /* 启用 CSS 平滑滚动 */
+  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
 
 .position-relative {
   position: relative;
 }
-
 </style>
