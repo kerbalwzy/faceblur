@@ -29,6 +29,7 @@
             size="x-small"
             color="error"
             variant="flat"
+            :disabled="appStore.processRate > 0"
             @click="deleteIgnoreFace(index)"
           >
           </v-btn>

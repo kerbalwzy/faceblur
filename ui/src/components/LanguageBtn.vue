@@ -25,6 +25,7 @@
 
 <script lang="ts" setup>
 import { useI18n } from "vue-i18n";
+import SocketService from "@/services/socket";
 interface Language {
   name: string;
   code: string;
@@ -40,9 +41,8 @@ const languages: Language[] = [
 const selectLanguage = (code: string) => {
   console.debug("Selected language:", code);
   locale.value = code;
-  // TODO: sync systray buttons language
+  SocketService.emit("set_language", code);
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

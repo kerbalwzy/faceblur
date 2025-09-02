@@ -21,7 +21,7 @@ class VideoBlurer:
         self.recognizer = recognizer
         #
         input_name, input_fmt = input.rsplit(".", 1)
-        output = input_name + "_blurred." + input_fmt
+        self.output_file = input_name + "_blurred." + input_fmt
         #
         self.input: av.container.InputContainer = av.open(
             input, mode="r", format=input_fmt
@@ -41,7 +41,7 @@ class VideoBlurer:
         self.progress: int = 0
         #
         self.output: av.container.OutputContainer = av.open(
-            output,
+            self.output_file,
             mode="w",
             format=input_fmt,
         )

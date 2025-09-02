@@ -30,18 +30,21 @@ class FaceRecognizer:
             allowed_modules=["detection", "recognition"],
             providers=self.providers,
         )
-        self.sim_thresh = 0.6
+        self.sim_thresh = 0.5
         self.faceignore_normed_embs = []
         self.prepare()
 
     @staticmethod
     def is_same_face(
-        normed_emb1: np.ndarray, normed_emb2: np.ndarray, sim_thresh: float = 0.6
+        normed_emb1: np.ndarray, normed_emb2: np.ndarray, sim_thresh: float = 0.5
     ) -> bool:
+        """
+        sim_thresh means similarity threshold
+        """
         return np.dot(normed_emb1, normed_emb2) >= sim_thresh
 
     def prepare(
-        self, det_thresh: float = 0.6, det_size=(640, 640), sim_thresh: float = 0.6
+        self, det_thresh: float = 0.5, det_size=(640, 640), sim_thresh: float = 0.5
     ):
         logger.debug(
             f"Prepare: providers={self.providers} det_thresh={det_thresh}, det_size={det_size}, sim_thresh={sim_thresh}"

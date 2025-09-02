@@ -7,10 +7,12 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    FaceRecConf: typeof import('./src/components/FaceRecConf.vue')['default']
     IgnoreFaces: typeof import('./src/components/IgnoreFaces.vue')['default']
     LanguageBtn: typeof import('./src/components/LanguageBtn.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     VideoInput: typeof import('./src/components/VideoInput.vue')['default']
+    VideoOutput: typeof import('./src/components/VideoOutput.vue')['default']
   }
 }
