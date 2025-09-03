@@ -27,6 +27,12 @@ global face_recognizer
 face_recognizer = None
 
 
+@socketio.on("show_window")
+def handle_show_window(*args):
+    appui.show_window()
+    socketio.emit("window_showed")
+
+
 @socketio.on("get_language")
 def handle_get_language(*args):
     socketio.emit("lang", {"result": settings.get("lang")})

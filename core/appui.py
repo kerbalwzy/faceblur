@@ -101,6 +101,8 @@ class AppUI:
     def show_window(self):
         self.window.hidden = False
         self.window.show()
+        self.window.restore()
+
         logger.debug(f"show window {self.window.title}")
 
     def quite(self):
