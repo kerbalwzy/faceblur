@@ -57,11 +57,9 @@ def frame_preview(
 def systray_darwin_icon(icon: Image.Image) -> Image.Image:
     if icon.mode != "RGBA":
         icon = icon.convert("RGBA")
-    icon = icon.copy()
-    data = np.array(icon)
-    alpha = data[:, :, 3]
-    data[alpha > 0, :3] = [255, 255, 255]
-    icon = Image.fromarray(data)
+    icon = icon.copy().resize((64, 64))
+    icon = icon.convert("L")
+    icon = icon.convert("RGBA")
     return icon
 
 

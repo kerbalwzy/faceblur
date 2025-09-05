@@ -1,9 +1,8 @@
 import logging
-import os
 import platform
 import subprocess
-import eventlet
 import threading
+import time
 from pathlib import Path
 from webview import FileDialog
 from flask import Flask
@@ -21,7 +20,7 @@ __all__ = ["app", "socketio"]
 
 logger = logging.getLogger("faceblur")
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode="eventlet", cors_allowed_origins="file://")
+socketio = SocketIO(app, async_mode="threading", cors_allowed_origins="file://")
 
 global face_recognizer
 face_recognizer = None
@@ -86,7 +85,7 @@ def handle_start_task(params: dict):
     t.start()
     while t.is_alive():
         socketio.emit("process_rate_update", {"result": blurer.progress})
-        eventlet.sleep(0.1)
+        time.sleep(0.1)
 
     socketio.emit("output_video_ready", {"result": blurer.output_file})
 
