@@ -3,7 +3,7 @@
     <div
       v-if="!appStore.sourceVideo"
       class="d-flex flex-column align-center justify-center pa-5 cursor-pointer"
-      @click="selectVideoFile"
+      @click="setSourceVideo"
     >
       <v-icon size="48" color="primary">mdi-video-plus</v-icon>
       <p class="text-caption">{{ t("label.ClickHere") }}</p>
@@ -34,20 +34,18 @@
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
-import SocketService from "@/services/socket";
 import { useAppStore } from "@/stores";
 
 const appStore = useAppStore();
 
-SocketService.on("input_video_selected", (data) => {
-  if (data.result && data.result.length > 0) {
-    appStore.updateSourceVideo(data.result[0]);
-  }
-});
-
-const selectVideoFile = () => {
+const setSourceVideo = () => {
   if (!appStore.sourceVideo) {
-    SocketService.emit("select_input_video", null);
+    pywebview.api.set_source_video().then((result: null | string) => {
+      console.log("set_source_video:", result);
+      if (result) {
+        appStore.updateSourceVideo(result);
+      }
+    });
   }
 };
 

@@ -25,7 +25,6 @@
 
 <script lang="ts" setup>
 import { useI18n } from "vue-i18n";
-import SocketService from "@/services/socket";
 interface Language {
   name: string;
   code: string;
@@ -41,7 +40,9 @@ const languages: Language[] = [
 const selectLanguage = (code: string) => {
   console.debug("Selected language:", code);
   locale.value = code;
-  SocketService.emit("set_language", code);
+  pywebview.api.set_setting("lang", code).then((result: any) => {
+    console.log("set_setting: lang = ", result);
+  });
 };
 </script>
 

@@ -10,6 +10,7 @@ export const zh = {
     FaceRecConf: "人脸识别配置",
     DetThresh: "检测阈值",
     SimThresh: "相似度阈值",
+    AiModelLoading: "AI模型加载中，请稍后...",
   },
   msg: {
     Required: "必填",

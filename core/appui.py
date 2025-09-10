@@ -5,10 +5,12 @@ import sys
 import webview
 from PIL import Image, ImageDraw
 
+
+from core.consts import STATIC_INDEX, ICON_PATH
+from core.i18n import t
+from core.api import AppAPI
 from core.uitls import systray_darwin_icon
 
-from .consts import STATIC_INDEX, ICON_PATH
-from .i18n import t
 
 __all__ = ["appui"]
 
@@ -134,4 +136,4 @@ class AppUI:
         webview.start(func=func, debug=debug)
 
 
-appui = AppUI(url=STATIC_INDEX, icon=ICON_PATH)
+appui = AppUI(url=STATIC_INDEX, icon=ICON_PATH, js_api=AppAPI())

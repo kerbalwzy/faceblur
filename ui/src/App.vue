@@ -11,10 +11,10 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useTheme } from "vuetify";
-
 import { getSystemTheme, setupThemeChangeListener } from "@/plugins";
 
 const theme = useTheme();
+
 onMounted(() => {
   // 主题设置 - 跟随系统主题
   theme.global.name.value = getSystemTheme();

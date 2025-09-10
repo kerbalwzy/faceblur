@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const useAppStore = defineStore("app", {
   state: () => ({
     sourceVideo: "",
-    ignoreFaces: [],
+    ignoreFaces: <string[]>[],
     faceRecConf: {
       detThresh: 0.5,
       simThresh: 0.5,
@@ -20,7 +20,7 @@ export const useAppStore = defineStore("app", {
       }
       this.sourceVideo = sourceVideo;
     },
-    addIgnoreFace(filepath: never) {
+    addIgnoreFace(filepath: string) {
       if (this.ignoreFaces.includes(filepath)) {
         return;
       }

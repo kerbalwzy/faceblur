@@ -9,6 +9,7 @@ export const en = {
     FaceRecConf: "Face Recognition Configuration",
     DetThresh: "Detect Threshold",
     SimThresh: "Similarity Threshold",
+    AiModelLoading: "AI Model Loading, Please Wait...",
   },
   msg: {
     Required: "Required",

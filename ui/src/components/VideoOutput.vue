@@ -41,7 +41,6 @@
 </template>
 
 <script setup lang="ts">
-import SocketService from "@/services/socket";
 import { useAppStore } from "@/stores";
 import { useI18n } from "vue-i18n";
 
@@ -49,35 +48,27 @@ const { t } = useI18n();
 
 const appStore = useAppStore();
 
-SocketService.on("output_video_ready", (data) => {
-  if (data.result) {
-    appStore.updateOutputVideo(data.result);
-    appStore.updateProcessRate(0);
-  }
-});
-
-SocketService.on("process_rate_update", (data) => {
-  if (data.result) {
-    appStore.updateProcessRate(data.result);
-  }
-});
-
 const startTask = () => {
   appStore.outputVideo = "";
   appStore.processRate = 1;
-  const params = {
-    sourceVideo: appStore.sourceVideo,
-    ignoreFaces: appStore.ignoreFaces,
-    faceRecConf: appStore.faceRecConf,
-  };
-  SocketService.emit("start_task", params);
+  pywebview.api
+    .start_task(
+      appStore.sourceVideo,
+      appStore.ignoreFaces,
+      appStore.faceRecConf
+    )
+    .then((result: string) => {
+      console.log("start_task: finished", result);
+      appStore.updateOutputVideo(result);
+      appStore.updateProcessRate(0);
+    });
 };
 
 const downloadVideo = () => {
   if (!appStore.outputVideo) {
     return;
   }
-  SocketService.emit("open_output_video", appStore.outputVideo);
+  pywebview.api.show_output_video(appStore.outputVideo);
 };
 </script>
 

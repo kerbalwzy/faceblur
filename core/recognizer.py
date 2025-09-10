@@ -127,3 +127,6 @@ class FaceRecognizer:
                 face_position = (x1, y1, x2, y2)
                 res.append(face_position)
         return res
+
+
+face_recognizer = None

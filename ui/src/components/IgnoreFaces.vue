@@ -43,7 +43,6 @@
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
-import SocketService from "@/services/socket";
 import { useAppStore } from "@/stores";
 import { ref, onMounted, onUnmounted } from "vue";
 
@@ -106,15 +105,13 @@ onUnmounted(() => {
   container.removeEventListener("touchend", handleTouchEnd);
 });
 
-SocketService.on("ignore_face_selected", (data) => {
-  if (data.result && data.result.length > 0) {
-    const res: never[] = data.result;
-    res.forEach((f) => appStore.addIgnoreFace(f));
-  }
-});
-
 const addIgnoreFace = () => {
-  SocketService.emit("add_ignore_face", null);
+  pywebview.api.set_ignore_faces().then((result: null | string[]) => {
+    console.log("set_ignore_faces:", result);
+    if (result) {
+      result.forEach((f) => appStore.addIgnoreFace(f));
+    }
+  });
 };
 
 const deleteIgnoreFace = (index: number) => {
