@@ -128,6 +128,7 @@ class AppUI:
             pystray.MenuItem(t("label.ShowWindow"), self.show_window),
             pystray.MenuItem(t("label.Quite"), self.quite),
         )
+        self.systray.update_menu()
         logger.debug(f"update systray language")
 
     def run(self, func=None, debug: bool = False):

@@ -35,6 +35,7 @@ class AppAPI:
 
             t.set_locale(value)
             appui.update_systray_language()
+        logger.info(f"set setting {key} to {value}")
 
     def set_source_video(self):
         from core.appui import appui
@@ -52,6 +53,8 @@ class AppAPI:
         result = appui.window.create_file_dialog(
             FileDialog.OPEN, allow_multiple=True, file_types=file_types
         )
+        if result:
+            logger.info(f"set ignore faces {result}")
         return result and list(result)
 
     def start_task(

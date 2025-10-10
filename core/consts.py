@@ -7,3 +7,5 @@ ICON_PATH = os.path.join(PROJECT_DIR, "favicon.ico")
 #
 STATIC_DIR = os.path.join(PROJECT_DIR, "static")
 STATIC_INDEX = f"file://{STATIC_DIR}/index.html"
+#
+LOG_PATH = os.path.join(PROJECT_DIR, "log.txt")

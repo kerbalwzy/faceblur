@@ -217,3 +217,4 @@ settings.json
 faceignore_example copy*.jpg
 build_*
 favicon.icns
+log.*
