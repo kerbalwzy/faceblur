@@ -218,3 +218,4 @@ faceignore_example copy*.jpg
 build_*
 favicon.icns
 log.*
+input.mp4.faces
