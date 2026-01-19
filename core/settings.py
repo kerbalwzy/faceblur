@@ -39,4 +39,5 @@ class Settings:
         self.__settings[key] = value
         self.save_to_file()
 
+
 settings = Settings()

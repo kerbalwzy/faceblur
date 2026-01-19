@@ -211,11 +211,11 @@ models/
 static/
 
 test*.*
-*_blurred.*
+*.blurred.*
 .DS_Store
 settings.json
 faceignore_example copy*.jpg
 build_*
 favicon.icns
 log.*
-input.mp4.faces
+temp/

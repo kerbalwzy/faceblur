@@ -16,15 +16,7 @@ class FaceRecognizer:
     isinited: bool = False
     providers: List[str] = None
     app: FaceAnalysis = None
-
-    @staticmethod
-    def is_same_face(
-        normed_emb1: np.ndarray, normed_emb2: np.ndarray, sim_thresh: float = 0.5
-    ) -> bool:
-        """
-        sim_thresh means similarity threshold
-        """
-        return np.dot(normed_emb1, normed_emb2) >= sim_thresh
+    det_thresh: float = 0.65
 
     @classmethod
     def init(cls):
@@ -51,11 +43,12 @@ class FaceRecognizer:
 
     @classmethod
     def prepare(
-        cls, det_thresh: float = 0.5, det_size=(640, 640), sim_thresh: float = 0.5
+        cls,
+        det_thresh: float = 0.65,
+        det_size=(640, 640),
     ):
-        logger.debug(
-            f"Prepare: det_thresh={det_thresh}, det_size={det_size}, sim_thresh={sim_thresh}"
-        )
+        cls.det_thresh = det_thresh
+        logger.debug(f"Prepare: det_thresh={det_thresh}, det_size={det_size}")
         try:
             cls.app.prepare(
                 ctx_id=(

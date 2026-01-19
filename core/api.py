@@ -6,19 +6,20 @@ import time
 from webview import FileDialog
 from pathlib import Path
 
-from core.blurer import VideoBlurer
-from core.recognizer import FaceRecognizer, face_recognizer
+from core.face import FaceRecognizer
+from core.video import VideoFaceParser, VideoFaceBlurTool
 
 logger = logging.getLogger("faceblur")
 
 
 class AppAPI:
+    currentVideoParser: VideoFaceParser = None
+    currentVideoBlurTool: VideoFaceBlurTool = None
 
-    def load_ai_models(self):
-
-        global face_recognizer
-        if face_recognizer is None:
-            face_recognizer = FaceRecognizer()
+    def init_face_recognizer(self):
+        if not FaceRecognizer.isinited:
+            FaceRecognizer.init()
+        return FaceRecognizer.isinited
 
     def get_setting(self, key: str):
         from core.settings import settings
@@ -37,7 +38,7 @@ class AppAPI:
             appui.update_systray_language()
         logger.info(f"set setting {key} to {value}")
 
-    def set_source_video(self):
+    def open_source_video(self):
         from core.appui import appui
 
         file_types = ("Video File (*.mp4;*.avi;*.mov)",)
@@ -46,43 +47,69 @@ class AppAPI:
         )
         return result and list(result)[0]
 
-    def set_ignore_faces(self):
-        from core.appui import appui
-
-        file_types = ("Image File (*.jpg;*.jpeg;*.png)",)
-        result = appui.window.create_file_dialog(
-            FileDialog.OPEN, allow_multiple=True, file_types=file_types
-        )
-        if result:
-            logger.info(f"set ignore faces {result}")
-        return result and list(result)
-
-    def start_task(
-        self, source_video: str, ignore_faces: list[str], face_rec_conf: dict
+    def parse_video_faces(
+        self, video_path: str, det_thresh: float, track_thresh: float
     ):
         from core.appui import appui
 
-        global face_recognizer
-        if face_recognizer is None:
-            face_recognizer = FaceRecognizer()
         #
-        face_recognizer.prepare(
-            det_thresh=face_rec_conf["detThresh"],
-            sim_thresh=face_rec_conf["simThresh"],
+        if not FaceRecognizer.isinited:
+            FaceRecognizer.init()
+        if FaceRecognizer.det_thresh != det_thresh:
+            FaceRecognizer.prepare(det_thresh=det_thresh)
+        #
+        parser = VideoFaceParser(
+            video_path=video_path,
+            track_thresh=track_thresh,
         )
-        face_recognizer.set_faceignore(ignore_faces)
-        blurer = VideoBlurer(face_recognizer, source_video)
-        t = threading.Thread(target=blurer.process, daemon=True)
+        self.currentVideoParser = parser
+        t = threading.Thread(target=parser.parse, daemon=True)
         t.start()
+
         while t.is_alive():
-            if blurer.progress > 1:
-                appui.window.evaluate_js(f"window.updateProcessRate({blurer.progress})")
+            if parser.progress > 1:
+                appui.window.evaluate_js(
+                    f"window.updateProgressRate('face_parse_progress', {parser.progress})"
+                )
             time.sleep(0.5)
+        return parser._generate_result()
+    
+    def cancel_parse_video_faces(self):
+        if self.currentVideoParser:
+            self.currentVideoParser.cancel()
+            self.currentVideoParser = None
 
-        return blurer.output_file
 
-    def show_output_video(self, output_video: str):
-        path = Path(output_video)
+    def blur_video_faces(
+        self, video_path: str, task_id: str, blur_track_ids: list[int]
+    ):
+        from core.appui import appui
+
+        #
+        blur_tool = VideoFaceBlurTool(
+            video_path=video_path,
+            task_id=task_id,
+            blur_track_ids=blur_track_ids,
+        )
+        self.currentVideoBlurTool = blur_tool
+        t = threading.Thread(target=blur_tool.blur, daemon=True)
+        t.start()
+
+        while t.is_alive():
+            if blur_tool.progress > 1:
+                appui.window.evaluate_js(
+                    f"window.updateProgressRate('face_blur_progress', {blur_tool.progress})"
+                )
+            time.sleep(0.5)
+        return blur_tool.output_path
+    
+    def cancel_blur_video_faces(self):
+        if self.currentVideoBlurTool:
+            self.currentVideoBlurTool.cancel()
+            self.currentVideoBlurTool = None
+
+    def show_blurred_video(self, video_path: str):
+        path = Path(video_path)
         if not path.exists():
             return
         system = platform.system()

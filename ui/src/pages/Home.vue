@@ -62,7 +62,7 @@ window.addEventListener("pywebviewready", function () {
       locale.value = result;
     }
   });
-  pywebview.api.load_ai_models().then(() => {
+  pywebview.api.init_face_recognizer().then(() => {
     modelLoaded.value = true;
   });
 });
