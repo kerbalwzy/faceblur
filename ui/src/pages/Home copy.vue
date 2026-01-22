@@ -1,33 +1,17 @@
 <template>
   <v-container fluid>
     <div v-if="modelLoaded">
-      <v-stepper
-        :items="['', '', '']"
-        hide-actions
-        v-model="appStore.currentStep"
+      <div class="d-flex align-stretch justify-space-between">
+        <VideoInput class="video-input elevation-18" />
+        <IgnoreFaces class="ignore-faces ml-2 elevation-18" />
+        <LanguageBtn />
+      </div>
+      <div
+        class="d-flex align-stretch justify-space-between mt-10"
+        style="margin-right: 40px"
       >
-        <template v-slot:item.1>
-          <VideoInput style="height: 410px" />
-        </template>
-        <template v-slot:item.2>
-          <VideoFaces style="height: 410px" />
-        </template>
-        <template v-slot:item.3>
-          <v-card :title="t('label.Step') + 3">
-            <v-card-actions>
-              <v-btn @click="appStore.nextStep">{{ t("label.Next") }}</v-btn>
-            </v-card-actions>
-          </v-card>
-        </template>
-      </v-stepper>
-      <div class="mt-5 d-flex align-center justify-end">
-        <v-btn
-          icon="fab fa-github"
-          size="small"
-          variant="tonal"
-          @click="openLink('github')"
-        ></v-btn>
-        <LanguageBtn class="align-self-start" />
+        <FaceRecConf class="face-rec-conf elevation-18" />
+        <VideoOutput class="video-output elevation-18 ml-2" />
       </div>
     </div>
     <div
@@ -45,16 +29,20 @@
   </v-container>
 </template>
 <script setup lang="ts">
+import LanguageBtn from "@/components/LanguageBtn.vue";
+import VideoInput from "@/components/VideoInput.vue";
+import IgnoreFaces from "@/components/IgnoreFaces.vue";
+import FaceRecConf from "@/components/FaceRecConf.vue";
+import VideoOutput from "@/components/VideoOutput.vue";
+
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 import { useAppStore } from "@/stores";
-import VideoInput from "@/components/VideoInput.vue";
-import VideoFaces from "@/components/VideoFaces.vue";
-import LanguageBtn from "@/components/LanguageBtn.vue";
 
 declare global {
   interface Window {
-    appStore: any;
+    updateProgressRate: (rate: number) => void;
+    updateModelLoaded: (loaded: boolean) => void;
   }
 }
 
@@ -63,8 +51,11 @@ const appStore = useAppStore();
 const modelLoaded = ref(false);
 
 window.addEventListener("pywebviewready", function () {
-  window.appStore = appStore;
+  // expose methods for backend app
+  window.updateProgressRate = appStore.updateProgress;
 
+  //
+  console.log(pywebview.api);
   pywebview.api.get_setting("lang").then((result: any) => {
     console.log("get_setting: lang = ", result);
     if (result) {
@@ -75,20 +66,6 @@ window.addEventListener("pywebviewready", function () {
     modelLoaded.value = true;
   });
 });
-
-const openLink = (link: string) => {
-  let url = "";
-  switch (link) {
-    case "github":
-      url = "https://github.com/kerbalwzy/faceblur";
-      break;
-    default:
-      break;
-  }
-  if (url) {
-    window.open(url, "_blank");
-  }
-};
 </script>
 
 <style scoped>

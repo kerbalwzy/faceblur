@@ -112,13 +112,13 @@ class VideoFaceParser:
             raise e
         finally:
             self.input.close()
-        result = self._generate_result()
+        result = self._generate_result
         self._save_result(result)
         elapsed_time = time.time() - t_start
         self._print_statistics(elapsed_time)
 
         return result
-    
+
     def cancel(self):
         # Use for multi-threading
         self.canceled = True
@@ -142,10 +142,10 @@ class VideoFaceParser:
                 track_id = self.next_track_id
                 self.next_track_id += 1
                 # save face thumbnail
-                img_name = self._save_face_thumbnail(frame_img[y1:y2, x1:x2])
+                img_path = self._save_face_thumbnail(frame_img, face["position"])
                 self.tracked_faces[track_id] = TrackedFace(
                     track_id=track_id,
-                    img=img_name,
+                    img=img_path,
                     normed_emb=face["normed_emb"].copy(),
                     positions=[face_position],
                 )
@@ -202,7 +202,162 @@ class VideoFaceParser:
             "faces": [track.to_json() for track in sorted_tracks],
         }
 
-    def _save_face_thumbnail(self, face_roi, size=(128, 128)) -> Optional[str]:
+    def _save_face_thumbnail(
+        self, frame_img, position, size=(128, 128)
+    ) -> Optional[str]:
+        """
+        截取以原始人脸区域中心为中心，向外扩展原始区域高和宽1.5倍的正方形区域
+
+        当边界距离不够时，调整中心点位置，使四个方向的扩展长度始终一致
+
+        Args:
+            frame_img: 完整帧图像
+            position: 人脸位置 (x1, y1, x2, y2)
+            size: 输出缩略图大小
+
+        Returns:
+            缩略图的URI路径，如果失败则返回None
+        """
+        x1, y1, x2, y2 = position
+        frame_height, frame_width = frame_img.shape[:2]
+
+        # 验证人脸区域是否有效
+        if x1 >= x2 or y1 >= y2:
+            logger.warning(f"Invalid face position: ({x1}, {y1}, {x2}, {y2})")
+            return None
+
+        # 确保坐标在图像范围内
+        x1, y1 = max(0, x1), max(0, y1)
+        x2, y2 = min(frame_width, x2), min(frame_height, y2)
+
+        # 计算原始区域的宽和高
+        w = x2 - x1
+        h = y2 - y1
+
+        if w <= 0 or h <= 0:
+            logger.warning(f"Zero or negative face dimensions: w={w}, h={h}")
+            return None
+
+        # 计算原始人脸区域的中心点
+        center_x = (x1 + x2) // 2
+        center_y = (y1 + y2) // 2
+
+        # 计算扩展后的正方形边长（原始区域的1.5倍）
+        side_length = int(max(w, h) * 1.5)
+
+        # 确保边长不小于原始区域的最大边长
+        side_length = max(side_length, max(w, h))
+
+        # 计算半边长
+        half_side = side_length // 2
+
+        # 初始计算正方形区域（以原始中心点为中心）
+        new_x1 = center_x - half_side
+        new_y1 = center_y - half_side
+        new_x2 = new_x1 + side_length
+        new_y2 = new_y1 + side_length
+
+        # 检查是否需要调整中心点
+        adjust_x = 0
+        adjust_y = 0
+
+        # X轴方向调整
+        if new_x1 < 0:
+            # 左边界超出，需要向右移动中心点
+            adjust_x = -new_x1
+        elif new_x2 > frame_width:
+            # 右边界超出，需要向左移动中心点
+            adjust_x = frame_width - new_x2
+
+        # Y轴方向调整
+        if new_y1 < 0:
+            # 上边界超出，需要向下移动中心点
+            adjust_y = -new_y1
+        elif new_y2 > frame_height:
+            # 下边界超出，需要向上移动中心点
+            adjust_y = frame_height - new_y2
+
+        # 应用中心点调整
+        if adjust_x != 0 or adjust_y != 0:
+            # 计算调整后的中心点
+            center_x = center_x + adjust_x
+            center_y = center_y + adjust_y
+
+            # 重新计算正方形区域（使用调整后的中心点）
+            new_x1 = center_x - half_side
+            new_y1 = center_y - half_side
+            new_x2 = new_x1 + side_length
+            new_y2 = new_y1 + side_length
+
+        # 再次检查边界（防止调整后仍然超出）
+        if new_x1 < 0:
+            # 如果仍然超出左边界，强制调整
+            shift_x = -new_x1
+            new_x1 += shift_x
+            new_x2 += shift_x
+
+        if new_x2 > frame_width:
+            # 如果仍然超出右边界，强制调整
+            shift_x = new_x2 - frame_width
+            new_x1 -= shift_x
+            new_x2 -= shift_x
+
+        if new_y1 < 0:
+            # 如果仍然超出上边界，强制调整
+            shift_y = -new_y1
+            new_y1 += shift_y
+            new_y2 += shift_y
+
+        if new_y2 > frame_height:
+            # 如果仍然超出下边界，强制调整
+            shift_y = new_y2 - frame_height
+            new_y1 -= shift_y
+            new_y2 -= shift_y
+
+        # 最终边界检查
+        new_x1 = max(0, int(new_x1))
+        new_y1 = max(0, int(new_y1))
+        new_x2 = min(frame_width, int(new_x2))
+        new_y2 = min(frame_height, int(new_y2))
+
+        # 确保宽高有效
+        if new_x2 <= new_x1 or new_y2 <= new_y1:
+            # 如果扩展区域无效，使用原始区域
+            logger.warning("Expanded region invalid, falling back to original region")
+            new_x1, new_y1, new_x2, new_y2 = x1, y1, x2, y2
+
+        # 从原始帧中截取扩展区域
+        expanded_roi = frame_img[new_y1:new_y2, new_x1:new_x2]
+
+        if (
+            expanded_roi.size == 0
+            or expanded_roi.shape[0] == 0
+            or expanded_roi.shape[1] == 0
+        ):
+            logger.warning(
+                f"Empty ROI after expansion: ({new_x1}, {new_y1}, {new_x2}, {new_y2})"
+            )
+            return None
+
+        # 调整到目标大小
+        thumbnail = cv2.resize(expanded_roi, size, interpolation=cv2.INTER_AREA)
+
+        # 编码为jpg格式
+        success, buffer = cv2.imencode(".jpg", thumbnail)
+        if not success:
+            logger.warning("Failed to encode thumbnail to JPG")
+            return None
+
+        # 保存图像
+        img_bytes = buffer.tobytes()
+        md5_hash = hashlib.md5(img_bytes).hexdigest()
+        img_name = f"{md5_hash}.jpg"
+        img_path = os.path.join(consts.TEMP_FACES_IMG_DIR, img_name)
+        cv2.imwrite(img_path, thumbnail)
+
+        return Path(img_path).absolute().as_uri()
+
+    def _save_face_thumbnail_(self, face_roi, size=(128, 128)) -> Optional[str]:
         if face_roi.size == 0 or face_roi.shape[0] == 0 or face_roi.shape[1] == 0:
             return None
         # resize the face roi to the specified size
@@ -222,7 +377,7 @@ class VideoFaceParser:
         img_name = f"{md5_hash}.jpg"
         img_path = os.path.join(consts.TEMP_FACES_IMG_DIR, img_name)
         cv2.imwrite(img_path, thumbnail)
-        return img_name
+        return Path(img_path).absolute().as_uri()
 
     def _save_result(self, result: Dict) -> None:
         """save the result to a json file"""
@@ -357,7 +512,7 @@ class VideoFaceBlurTool:
         # blur and copy video data
         for frame in self.input.decode(self.input_video_stream):
             if self.canceled:
-                    break
+                break
             frame = self._blur_frame(frame)
             for output_packet in self.output_video_stream.encode(frame):
                 if self.canceled:
@@ -376,12 +531,12 @@ class VideoFaceBlurTool:
         # flush video encoder
         for packet in self.output_video_stream.encode():
             if self.canceled:
-                    break
+                break
             self.output.mux(packet)
         # log statistics
         elapsed_time = time.time() - t_start
         self._print_statistics(elapsed_time)
-    
+
     def cancel(self):
         # Use for multi-threading
         self.canceled = True

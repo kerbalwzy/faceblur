@@ -2,41 +2,90 @@ import { defineStore } from "pinia";
 
 export const useAppStore = defineStore("app", {
   state: () => ({
+    currentStep: 1,
     sourceVideo: "",
-    ignoreFaces: <string[]>[],
     faceRecConf: {
-      detThresh: 0.5,
-      simThresh: 0.5,
+      detThresh: 0.65,
+      trackThresh: 0.65,
     },
-    processRate: 0,
+    faceParseRes: {
+      taskId: "",
+      totalFaces: 0,
+      faces: [] as TrackedFace[],
+    },
+    progress: 0,
     outputVideo: "",
   }),
   actions: {
-    updateSourceVideo(sourceVideo: string) {
+    openSourceVideo() {
+      this.progress = 0;
       this.outputVideo = "";
-      this.processRate = 0;
-      if (this.sourceVideo === sourceVideo) {
-        return;
+      pywebview.api.open_source_video().then((sourceVideo: string) => {
+        this.sourceVideo = sourceVideo;
+      });
+    },
+    resetVideoFaces() {
+      this.faceParseRes.taskId = "";
+      this.faceParseRes.totalFaces = 0;
+      this.faceParseRes.faces = [];
+    },
+    parseVideoFaces() {
+      this.progress = 0;
+      this.resetVideoFaces();
+      pywebview.api
+        .parse_video_faces(
+          this.sourceVideo,
+          this.faceRecConf.detThresh,
+          this.faceRecConf.trackThresh
+        )
+        .then((res: any) => {
+          this.faceParseRes.taskId = res.video_info.task_id;
+          this.faceParseRes.totalFaces =
+            res.processing_info.unique_faces_tracked;
+          this.faceParseRes.faces = res.faces.map((face: TrackedFace) => ({
+            ...face,
+            selected: true,
+          }));
+        });
+    },
+    blurVideoFaces(face_track_ids: number[]) {
+      this.progress = 0;
+      pywebview.api
+        .blur_video_faces(
+          this.sourceVideo,
+          this.faceParseRes.taskId,
+          face_track_ids
+        )
+        .then((outputVideo: string) => {
+          this.outputVideo = outputVideo;
+        });
+    },
+    updateProgress(rate: number) {
+      this.progress = rate;
+    },
+    nextStep() {
+      this.currentStep++;
+      switch (this.currentStep) {
+        case 2:
+          this.parseVideoFaces();
+          break;
+        case 3:
+          this.blurVideoFaces(
+            this.faceParseRes.faces.map((face) => face.track_id)
+          );
+          break;
       }
-      this.sourceVideo = sourceVideo;
     },
-    addIgnoreFace(filepath: string) {
-      if (this.ignoreFaces.includes(filepath)) {
-        return;
+    prevStep() {
+      this.currentStep--;
+      switch (this.currentStep) {
+        case 1:
+          pywebview.api.cancel_parse_video_faces();
+          break;
+        case 2:
+          pywebview.api.cancel_blur_video_faces();
+          break;
       }
-      this.ignoreFaces.push(filepath);
-    },
-    delIgnoreFace(index: number) {
-      this.ignoreFaces = this.ignoreFaces.filter((f, i) => i !== index);
-    },
-    updatefaceRecConf(params: { detThresh: number; simThresh: number }) {
-      this.faceRecConf = params;
-    },
-    updateProcessRate(rate: number) {
-      this.processRate = rate;
-    },
-    updateOutputVideo(outputVideo: string) {
-      this.outputVideo = outputVideo;
     },
   },
   persist: true,

@@ -3,9 +3,9 @@
     <template v-slot:activator="{ props }">
       <v-btn
         v-bind="props"
+        icon="fas fa-language"
         size="small"
-        icon="mdi-translate"
-        variant="text"
+        variant="tonal"
         tabindex="0"
       ></v-btn>
     </template>

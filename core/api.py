@@ -3,6 +3,7 @@ import platform
 import subprocess
 import threading
 import time
+import multiprocessing
 from webview import FileDialog
 from pathlib import Path
 
@@ -11,14 +12,17 @@ from core.video import VideoFaceParser, VideoFaceBlurTool
 
 logger = logging.getLogger("faceblur")
 
+APILock = multiprocessing.Lock()
+
 
 class AppAPI:
     currentVideoParser: VideoFaceParser = None
     currentVideoBlurTool: VideoFaceBlurTool = None
 
     def init_face_recognizer(self):
-        if not FaceRecognizer.isinited:
-            FaceRecognizer.init()
+        with APILock:
+            if not FaceRecognizer.isinited:
+                FaceRecognizer.init()
         return FaceRecognizer.isinited
 
     def get_setting(self, key: str):
@@ -67,18 +71,17 @@ class AppAPI:
         t.start()
 
         while t.is_alive():
-            if parser.progress > 1:
+            if parser.progress > 0:
                 appui.window.evaluate_js(
-                    f"window.updateProgressRate('face_parse_progress', {parser.progress})"
+                    f"window.appStore.updateProgress({int(parser.progress * 100)})"
                 )
-            time.sleep(0.5)
-        return parser._generate_result()
-    
+            time.sleep(0.1)
+        return parser._generate_result
+
     def cancel_parse_video_faces(self):
         if self.currentVideoParser:
             self.currentVideoParser.cancel()
             self.currentVideoParser = None
-
 
     def blur_video_faces(
         self, video_path: str, task_id: str, blur_track_ids: list[int]
@@ -96,13 +99,13 @@ class AppAPI:
         t.start()
 
         while t.is_alive():
-            if blur_tool.progress > 1:
+            if blur_tool.progress > 0:
                 appui.window.evaluate_js(
-                    f"window.updateProgressRate('face_blur_progress', {blur_tool.progress})"
+                    f"window.appStore.updateProgress({int(blur_tool.progress * 100)})"
                 )
-            time.sleep(0.5)
+            time.sleep(0.1)
         return blur_tool.output_path
-    
+
     def cancel_blur_video_faces(self):
         if self.currentVideoBlurTool:
             self.currentVideoBlurTool.cancel()

@@ -6,10 +6,15 @@ export const en = {
     SelectSourceVideo: "Select source video",
     AddIgnoreFace: "Add ignore face",
     StartTask: "Start Task",
-    FaceRecConf: "Face Recognition Configuration",
-    DetThresh: "Detect Threshold",
-    SimThresh: "Similarity Threshold",
+
+    //
     AiModelLoading: "AI Model Loading, Please Wait...",
+    FaceRecConf: "Face Recognition Configuration",
+    DetectThreshold: "Detect Threshold",
+    TrackThreshold: "Track Threshold",
+    Prev: "Previous",
+    Next: "Next",
+    Reset: "Reset",
   },
   msg: {
     Required: "Required",

@@ -1,32 +1,56 @@
 <template>
-  <v-card color="#424242">
-    <div
-      v-if="!appStore.sourceVideo"
-      class="d-flex flex-column align-center justify-center pa-5 cursor-pointer"
-      @click="setSourceVideo"
-    >
-      <v-icon size="48" color="primary">mdi-video-plus</v-icon>
-      <p class="text-caption">{{ t("label.ClickHere") }}</p>
-      <p class="text-caption">{{ t("label.SelectSourceVideo") }}</p>
-      <p class="text-caption">(MP4)</p>
-    </div>
-    <video
-      v-else
-      :src="appStore.sourceVideo"
-      style="width: 100%; height: 100%"
-      controls
-    ></video>
-    <v-btn
-      v-if="appStore.sourceVideo"
-      class="delete-btn"
-      icon="mdi-delete"
-      size="x-small"
-      color="error"
-      variant="flat"
-      :disabled="appStore.processRate > 0"
-      @click="resetVideoInputFile"
-    >
-    </v-btn>
+  <v-card>
+    <v-card-text style="background-color: #3b3b3c; height: calc(100% - 48px)">
+      <div
+        v-if="!appStore.sourceVideo"
+        class="d-flex flex-column align-center justify-center pa-5 cursor-pointer"
+        style="width: 100%; height: 100%; color: aliceblue"
+        @click="appStore.openSourceVideo"
+      >
+        <v-icon size="96" color="#10357f">mdi-video-plus</v-icon>
+        <h4>{{ t("label.ClickHere") }}</h4>
+        <h4>{{ t("label.SelectSourceVideo") }}</h4>
+        <h4>(*.mp4;*.avi;*.mov)</h4>
+      </div>
+      <video
+        v-else
+        ref="sourceVideo"
+        :src="appStore.sourceVideo"
+        style="width: 100%; height: 100%"
+        controls
+      ></video>
+    </v-card-text>
+    <v-card-actions v-if="appStore.sourceVideo">
+      <v-btn
+        prepend-icon="fas fa-video-slash"
+        color="error"
+        variant="tonal"
+        @click="appStore.sourceVideo = ''"
+      >
+        {{ t("label.Reset") }}
+      </v-btn>
+      <v-spacer></v-spacer>
+      <v-dialog max-width="300">
+        <template v-slot:activator="{ props: activatorProps }">
+          <v-btn
+            v-bind="activatorProps"
+            icon="fas fa-cog"
+            density="comfortable"
+            color="surface-variant"
+            variant="tonal"
+          ></v-btn>
+        </template>
+        <template v-slot:default><FaceRecConf /> </template>
+      </v-dialog>
+      <v-btn
+        @click="appStore.nextStep"
+        prepend-icon="fas fa-hand-point-right"
+        color="primary"
+        variant="tonal"
+      >
+        {{ t("label.Next") }}
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -35,23 +59,23 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 import { useAppStore } from "@/stores";
+import FaceRecConf from "./FaceRecConf.vue";
+import { ref, watch } from "vue";
 
 const appStore = useAppStore();
+const sourceVideo = ref(null);
 
-const setSourceVideo = () => {
-  if (!appStore.sourceVideo) {
-    pywebview.api.set_source_video().then((result: null | string) => {
-      console.log("set_source_video:", result);
-      if (result) {
-        appStore.updateSourceVideo(result);
-      }
-    });
+watch(
+  () => appStore.currentStep,
+  (newStep) => {
+    if (!sourceVideo.value) return;
+    if (newStep === 1) return;
+    const video: any = sourceVideo.value;
+    if (video.readyState >= 2) {
+      video.pause();
+    }
   }
-};
-
-const resetVideoInputFile = () => {
-  appStore.updateSourceVideo("");
-};
+);
 </script>
 
 <style scoped>

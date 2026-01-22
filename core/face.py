@@ -33,7 +33,7 @@ class FaceRecognizer:
             )
         )
         cls.app = FaceAnalysis(
-            name="buffalo_l",
+            name="buffalo_s",
             root=PROJECT_DIR,
             allowed_modules=["detection", "recognition"],
             providers=cls.providers,

@@ -1,60 +1,65 @@
 <template>
   <v-card>
-    <div class="d-flex align-center justify-start">
+    <v-card-text style="background-color: #3b3b3c; height: calc(100% - 48px)">
       <div
-        style="width: 180px; min-width: 180px"
-        class="d-flex flex-column align-center justify-center pa-8 cursor-pointer elevation-20"
-        @click="addIgnoreFace"
-      >
-        <v-icon size="48" color="primary">mdi-image-plus</v-icon>
-        <p class="text-caption">{{ t("label.ClickHere") }}</p>
-        <p class="text-caption">{{ t("label.AddIgnoreFace") }}</p>
-        <p class="text-caption">(JPEG, JPG, PNG)</p>
-      </div>
-      <div
-        ref="ignoreFacesContainer"
-        class="d-flex flex-row align-center justify-start ignore-faces"
-        @wheel="handleWheel"
+        v-if="appStore.faceParseRes.faces.length > 0"
+        class="d-flex flex-wrap"
+        style="height: 100%"
       >
         <div
-          v-for="(face, index) in appStore.ignoreFaces"
-          :key="index"
-          class="ml-1 pa-1 position-relative d-flex align-center"
-          style="background-color: #424242; height: 100%"
+          v-for="face in appStore.faceParseRes.faces"
+          :key="face.track_id"
+          style="position: relative"
         >
-          <v-img :src="face" aspect-ratio="1/1" style="width: 150px"></v-img>
-          <v-btn
-            class="delete-btn"
-            icon="mdi-delete"
-            size="x-small"
-            color="error"
-            variant="flat"
-            :disabled="appStore.processRate > 0"
-            @click="deleteIgnoreFace(index)"
+          <v-avatar
+            size="80"
+            class="ma-2 cursor-pointer"
+            :image="face.img"
+            @click="face.selected = !face.selected"
           >
-          </v-btn>
+          </v-avatar>
+          <v-icon
+            v-if="face.selected"
+            icon="fas fa-check-circle"
+            color="#38B000"
+            style="position: absolute; top: 0; left: 40px"
+          ></v-icon>
         </div>
       </div>
-    </div>
+      <Progress v-else style="height: 100%"></Progress>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn
+        prepend-icon="fas fa-hand-point-left"
+        color="error"
+        variant="tonal"
+        @click="appStore.prevStep"
+      >
+        {{ t("label.Prev") }}
+      </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn
+        v-if="appStore.faceParseRes.faces.length > 0"
+        prepend-icon="fas fa-hand-point-right"
+        color="primary"
+        variant="tonal"
+        @click="appStore.nextStep"
+      >
+        {{ t("label.Next") }}
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-const { t } = useI18n();
-
 import { useAppStore } from "@/stores";
 import { ref, onMounted, onUnmounted } from "vue";
+import Progress from "@/components/Progress.vue";
 
+const { t } = useI18n();
 const appStore = useAppStore();
 const ignoreFacesContainer = ref<HTMLElement | null>(null);
-
-const handleWheel = (event: WheelEvent) => {
-  if (!ignoreFacesContainer.value) return;
-  event.preventDefault();
-  const scrollDelta = (event.deltaX || event.deltaY) * 1.5;
-  ignoreFacesContainer.value.scrollLeft += scrollDelta;
-};
 
 const touchData = ref({
   startX: 0,
@@ -104,19 +109,6 @@ onUnmounted(() => {
   container.removeEventListener("touchmove", handleTouchMove);
   container.removeEventListener("touchend", handleTouchEnd);
 });
-
-const addIgnoreFace = () => {
-  pywebview.api.set_ignore_faces().then((result: null | string[]) => {
-    console.log("set_ignore_faces:", result);
-    if (result) {
-      result.forEach((f) => appStore.addIgnoreFace(f));
-    }
-  });
-};
-
-const deleteIgnoreFace = (index: number) => {
-  appStore.delIgnoreFace(index);
-};
 </script>
 
 <style scoped>

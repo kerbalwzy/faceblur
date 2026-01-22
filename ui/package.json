@@ -9,32 +9,25 @@
     "build:watch": "vite build --watch"
   },
   "dependencies": {
-    "@mdi/font": "6.2.95",
-    "fabric": "^5.4.2",
-    "gifuct-js": "^2.1.2",
-    "pinia": "^3.0.3",
-    "pinia-plugin-persistedstate": "^4.5.0",
-    "roboto-fontface": "*",
-    "socket.io-client": "^4.8.1",
-    "uuid": "^11.0.3",
-    "vue": "^3.4.21",
-    "vue-i18n": "^9.13.1",
-    "vue-router": "^4.4.3",
-    "vuetify": "^3.5.8"
+    "@mdi/font": "^7.4.47",
+    "pinia": "^3.0.4",
+    "pinia-plugin-persistedstate": "^4.7.1",
+    "vue": "^3.5.27",
+    "vue-i18n": "^11.2.8",
+    "vue-router": "^4.6.4",
+    "vuetify": "^3.11.7"
   },
   "devDependencies": {
-    "@babel/types": "^7.24.0",
-    "@types/fabric": "^5.3.9",
-    "@types/node": "^20.11.25",
-    "@vitejs/plugin-vue": "^5.0.4",
-    "sass": "^1.71.1",
-    "typescript": "^5.4.2",
-    "unplugin-fonts": "^1.1.1",
-    "unplugin-vue-components": "^0.26.0",
-    "unplugin-vue-router": "^0.9.1",
-    "vite": "^5.1.5",
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "@types/node": "^25.0.10",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "sass": "^1.97.3",
+    "typescript": "^5.9.3",
+    "unplugin-vue-components": "^31.0.0",
+    "unplugin-vue-router": "^0.19.2",
+    "vite": "^7.3.1",
     "vite-plugin-vue-layouts": "^0.11.0",
     "vite-plugin-vuetify": "^2.0.3",
-    "vue-tsc": "^2.0.6"
+    "vue-tsc": "^3.2.2"
   }
 }
