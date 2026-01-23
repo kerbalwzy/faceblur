@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import struct
 import time
 import av
 import logging
@@ -405,13 +406,39 @@ class VideoFaceParser:
 
 
 class VideoFaceBlurTool:
+
+    def _create_output_video_stream(self):
+        stream = self.output.add_stream(
+            codec_name="h264",
+            rate=self.input_video_stream.codec_context.rate,
+            time_base=self.input_video_stream.time_base,
+            width=self.input_video_stream.codec_context.width,
+            height=self.input_video_stream.codec_context.height,
+            pix_fmt=self.input_video_stream.codec_context.pix_fmt,
+            bit_rate=self.input_video_stream.codec_context.bit_rate,
+            thread_type=self.input_video_stream.codec_context.thread_type,
+            options={
+                "preset": "ultrafast",
+                "movflags": "+faststart",
+            },
+        )
+        return stream
+
+    def _create_output_audio_stream(self):
+        steam = self.output.add_stream(
+            codec_name="aac",
+            rate=self.input_audio_stream.codec_context.rate,
+            format=self.input_audio_stream.codec_context.format,
+        )
+        return steam
+
     def __init__(self, video_path: str, task_id: str, blur_track_ids: List[int]):
         self.video_path = Path(video_path)
         video_format = self.video_path.suffix[1:]
         self.output_path = (
-            self.video_path.with_suffix(f".blurred.{video_format}")
-            .absolute()
+            self.video_path.absolute()
             .as_posix()
+            .replace(self.video_path.suffix, f"_blurred.mp4")
         )
         self.task_id = task_id
         self.blur_track_ids = blur_track_ids
@@ -441,25 +468,9 @@ class VideoFaceBlurTool:
             mode="w",
             format=video_format,
         )
-        self.output_video_stream: av.VideoStream = self.output.add_stream(
-            codec_name="h264",
-            rate=self.input_video_stream.codec_context.rate,
-            width=self.input_video_stream.codec_context.width,
-            height=self.input_video_stream.codec_context.height,
-            pix_fmt=self.input_video_stream.codec_context.pix_fmt,
-            bit_rate=self.input_video_stream.codec_context.bit_rate,
-            thread_type=self.input_video_stream.codec_context.thread_type,
-            time_base=self.input_video_stream.time_base,
-            options={"preset": "ultrafast"},
-        )
-        self.output_audio_stream: Union[bool, av.AudioStream] = bool(
-            self.input.streams.audio
-        ) and self.output.add_stream(
-            codec_name=self.input_audio_stream.codec_context.name,
-            rate=self.input_audio_stream.codec_context.rate,
-            format=self.input_audio_stream.codec_context.format,
-            bit_rate=self.input_audio_stream.codec_context.bit_rate,
-            thread_type=self.input_audio_stream.codec_context.thread_type,
+        self.output_video_stream: av.VideoStream = self._create_output_video_stream()
+        self.output_audio_stream: Union[bool, av.AudioStream] = (
+            bool(self.input.streams.audio) and self._create_output_audio_stream()
         )
         #
         self.faces_to_blur = self._get_faces_to_blur()
@@ -493,14 +504,31 @@ class VideoFaceBlurTool:
         blur_pos = self.faces_to_blur.pop(self.processed_frames, [])
         for pos in blur_pos:
             x1, y1, x2, y2 = pos["x1"], pos["y1"], pos["x2"], pos["y2"]
-            img[y1:y2, x1:x2] = cv2.GaussianBlur(img[y1:y2, x1:x2], (99, 99), 30)
+            # img[y1:y2, x1:x2] = cv2.GaussianBlur(img[y1:y2, x1:x2], (99, 99), 30)
+            y1, y2 = max(0, y1), min(img.shape[0], y2)
+            x1, x2 = max(0, x1), min(img.shape[1], x2)
+
+            if y2 > y1 and x2 > x1:
+                roi = img[y1:y2, x1:x2]
+                h, w = roi.shape[:2]
+                small = cv2.resize(
+                    roi,
+                    (max(1, w // 4), max(1, h // 4)),
+                    interpolation=cv2.INTER_LINEAR,
+                )
+                blurred_small = cv2.GaussianBlur(small, (25, 25), 30)
+                img[y1:y2, x1:x2] = cv2.resize(
+                    blurred_small, (w, h), interpolation=cv2.INTER_LINEAR
+                )
+
         blurred_frame = av.VideoFrame.from_ndarray(img, format="bgr24")
         blurred_frame.pts = frame.pts
         blurred_frame.time_base = frame.time_base
+        blurred_frame.colorspace = frame.colorspace
+        blurred_frame.color_range = frame.color_range
         return blurred_frame
 
-    def blur(self, callback=None):
-        t_start = time.time()
+    def _blur(self, callback=None):
         # copy audio data
         if self.input_audio_stream:
             for packet in self.input.demux(self.input_audio_stream):
@@ -517,6 +545,8 @@ class VideoFaceBlurTool:
             for output_packet in self.output_video_stream.encode(frame):
                 if self.canceled:
                     break
+                if output_packet.pts is None:
+                    continue
                 self.output.mux(output_packet)
             # update progress
             self.processed_frames += 1
@@ -533,6 +563,17 @@ class VideoFaceBlurTool:
             if self.canceled:
                 break
             self.output.mux(packet)
+
+    def blur(self, callback=None):
+        t_start = time.time()
+        try:
+            self._blur(callback)
+        except Exception as e:
+            raise e
+        finally:
+            self.input.close()
+            self.output.close()
+
         # log statistics
         elapsed_time = time.time() - t_start
         self._print_statistics(elapsed_time)

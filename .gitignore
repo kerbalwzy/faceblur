@@ -211,7 +211,6 @@ models/
 static/
 
 test*.*
-*.blurred.*
 .DS_Store
 settings.json
 faceignore_example copy*.jpg
@@ -219,3 +218,5 @@ build_*
 favicon.icns
 log.*
 temp/
+assets/
+!assets/input.mp4

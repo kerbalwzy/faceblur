@@ -7,7 +7,7 @@
         style="width: 100%; height: 100%; color: aliceblue"
         @click="appStore.openSourceVideo"
       >
-        <v-icon size="96" color="#10357f">mdi-video-plus</v-icon>
+        <v-icon size="96" color="#10357f" icon="fas fa-video"></v-icon>
         <h4>{{ t("label.ClickHere") }}</h4>
         <h4>{{ t("label.SelectSourceVideo") }}</h4>
         <h4>(*.mp4;*.avi;*.mov)</h4>
@@ -63,7 +63,7 @@ import FaceRecConf from "./FaceRecConf.vue";
 import { ref, watch } from "vue";
 
 const appStore = useAppStore();
-const sourceVideo = ref(null);
+const sourceVideo = ref<HTMLVideoElement>();
 
 watch(
   () => appStore.currentStep,
@@ -74,7 +74,7 @@ watch(
     if (video.readyState >= 2) {
       video.pause();
     }
-  }
+  },
 );
 </script>
 

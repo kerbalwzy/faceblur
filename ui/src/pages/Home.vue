@@ -13,11 +13,7 @@
           <VideoFaces style="height: 410px" />
         </template>
         <template v-slot:item.3>
-          <v-card :title="t('label.Step') + 3">
-            <v-card-actions>
-              <v-btn @click="appStore.nextStep">{{ t("label.Next") }}</v-btn>
-            </v-card-actions>
-          </v-card>
+          <VideoOutput style="height: 410px" />
         </template>
       </v-stepper>
       <div class="mt-5 d-flex align-center justify-end">
@@ -50,6 +46,7 @@ import { ref } from "vue";
 import { useAppStore } from "@/stores";
 import VideoInput from "@/components/VideoInput.vue";
 import VideoFaces from "@/components/VideoFaces.vue";
+import VideoOutput from "@/components/VideoOutput.vue";
 import LanguageBtn from "@/components/LanguageBtn.vue";
 
 declare global {

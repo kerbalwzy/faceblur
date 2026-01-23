@@ -36,7 +36,7 @@ export const useAppStore = defineStore("app", {
         .parse_video_faces(
           this.sourceVideo,
           this.faceRecConf.detThresh,
-          this.faceRecConf.trackThresh
+          this.faceRecConf.trackThresh,
         )
         .then((res: any) => {
           this.faceParseRes.taskId = res.video_info.task_id;
@@ -50,15 +50,21 @@ export const useAppStore = defineStore("app", {
     },
     blurVideoFaces(face_track_ids: number[]) {
       this.progress = 0;
+      this.outputVideo = "";
       pywebview.api
         .blur_video_faces(
           this.sourceVideo,
           this.faceParseRes.taskId,
-          face_track_ids
+          face_track_ids,
         )
         .then((outputVideo: string) => {
           this.outputVideo = outputVideo;
         });
+    },
+    showBlurredVideo() {
+      console.log(this.outputVideo);
+      if (!this.outputVideo) return;
+      pywebview.api.show_blurred_video(this.outputVideo);
     },
     updateProgress(rate: number) {
       this.progress = rate;
@@ -71,7 +77,9 @@ export const useAppStore = defineStore("app", {
           break;
         case 3:
           this.blurVideoFaces(
-            this.faceParseRes.faces.map((face) => face.track_id)
+            this.faceParseRes.faces
+              .filter((face) => face.selected)
+              .map((face) => face.track_id),
           );
           break;
       }
@@ -86,6 +94,12 @@ export const useAppStore = defineStore("app", {
           pywebview.api.cancel_blur_video_faces();
           break;
       }
+    },
+    newTask() {
+      this.resetVideoFaces();
+      this.sourceVideo = "";
+      this.outputVideo = "";
+      this.currentStep = 1;
     },
   },
   persist: true,
