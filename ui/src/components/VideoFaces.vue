@@ -3,7 +3,7 @@
     <v-card-text style="background-color: #3b3b3c; height: calc(100% - 48px)">
       <div
         v-if="appStore.faceParseRes.faces.length > 0"
-        class="d-flex flex-wrap justify-space-around align-center"
+        class="d-flex flex-wrap"
         style="height: 100%; overflow-y: auto"
       >
         <div

@@ -8,9 +8,18 @@
         @click="appStore.openSourceVideo"
       >
         <v-icon size="96" color="#10357f" icon="fas fa-video"></v-icon>
-        <h4>{{ t("label.ClickHere") }}</h4>
-        <h4>{{ t("label.SelectSourceVideo") }}</h4>
-        <h4>(*.mp4;*.avi;*.mov)</h4>
+        <h2>{{ t("label.ClickHere") }}</h2>
+        <h3>{{ t("label.SelectSourceVideo") }}</h3>
+        <v-icon
+          class="ma-2"
+          size="28"
+          color="warning"
+          icon="fas fa-exclamation-triangle"
+        ></v-icon>
+        <div>
+          <h4 class="text-capitalize">{{ t("label.VideoSupportTip0") }}</h4>
+          <h4 class="text-capitalize">{{ t("label.VideoSupportTip1") }}</h4>
+        </div>
       </div>
       <video
         v-else
@@ -74,7 +83,7 @@ watch(
     if (video.readyState >= 2) {
       video.pause();
     }
-  },
+  }
 );
 </script>
 

@@ -21,6 +21,7 @@
       </v-btn>
       <v-spacer></v-spacer>
       <v-btn
+        v-if="appStore.outputVideo"
         prepend-icon="fas fa-redo"
         color="#38B000"
         variant="tonal"
@@ -60,7 +61,7 @@ watch(
     if (video.readyState >= 2) {
       video.pause();
     }
-  },
+  }
 );
 </script>
 

@@ -18,5 +18,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     VideoFaces: typeof import('./src/components/VideoFaces.vue')['default']
     VideoInput: typeof import('./src/components/VideoInput.vue')['default']
+    VideoOutput: typeof import('./src/components/VideoOutput.vue')['default']
   }
 }

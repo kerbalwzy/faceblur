@@ -8,6 +8,7 @@ from webview import FileDialog
 from pathlib import Path
 
 from core.face import FaceRecognizer
+from core.uitls import clean_temp_files
 from core.video import VideoFaceParser, VideoFaceBlurTool
 
 logger = logging.getLogger("faceblur")
@@ -49,7 +50,9 @@ class AppAPI:
         result = appui.window.create_file_dialog(
             FileDialog.OPEN, allow_multiple=False, file_types=file_types
         )
-        return result and list(result)[0]
+        filtpath = result and result[0]
+        clean_temp_files()
+        return filtpath or None
 
     def parse_video_faces(
         self, video_path: str, det_thresh: float, track_thresh: float
