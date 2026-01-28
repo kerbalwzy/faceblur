@@ -16,15 +16,7 @@
           <VideoOutput style="height: 410px" />
         </template>
       </v-stepper>
-      <div class="mt-5 d-flex align-center justify-end">
-        <v-btn
-          icon="fab fa-github"
-          size="small"
-          variant="tonal"
-          @click="openLink('github')"
-        ></v-btn>
-        <LanguageBtn class="align-self-start" />
-      </div>
+      <Footer />
     </div>
     <div
       v-else
@@ -47,7 +39,7 @@ import { useAppStore } from "@/stores";
 import VideoInput from "@/components/VideoInput.vue";
 import VideoFaces from "@/components/VideoFaces.vue";
 import VideoOutput from "@/components/VideoOutput.vue";
-import LanguageBtn from "@/components/LanguageBtn.vue";
+import Footer from "@/components/Footer.vue";
 
 declare global {
   interface Window {
@@ -72,20 +64,6 @@ window.addEventListener("pywebviewready", function () {
     modelLoaded.value = true;
   });
 });
-
-const openLink = (link: string) => {
-  let url = "";
-  switch (link) {
-    case "github":
-      url = "https://github.com/kerbalwzy/faceblur";
-      break;
-    default:
-      break;
-  }
-  if (url) {
-    window.open(url, "_blank");
-  }
-};
 </script>
 
 <style scoped>

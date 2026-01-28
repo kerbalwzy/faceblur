@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     FaceRecConf: typeof import('./src/components/FaceRecConf.vue')['default']
+    Footer: typeof import('./src/components/Footer.vue')['default']
     LanguageBtn: typeof import('./src/components/LanguageBtn.vue')['default']
     Progress: typeof import('./src/components/Progress.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
