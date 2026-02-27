@@ -208,7 +208,6 @@ __marimo__/
 
 # Custom
 models/
-static/
 
 test*.*
 .DS_Store
