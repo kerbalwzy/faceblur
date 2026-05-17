@@ -1,8 +1,7 @@
 # FaceBlur
 通过AI技术，快速的对视频中的人脸进行识别与模糊，保护人脸隐私安全。
 
-### [演示视频](https://www.xiaohongshu.com/explore/69a109cd000000001d0267f5?xsec_token=ABKJW-6EW32eaJOosCXr8WYtxlGoSiljG0J3psp3J_1AM=&xsec_source=pc_user)  
-### [联系作者](https://www.xiaohongshu.com/user/profile/66dfb8ec000000001d033e12)
+### [演示视频](https://www.bilibili.com/video/BV1bdAyzeEEX/?share_source=copy_web&vd_source=d1f2ee8b465790af933d6569062433e4)  
 
 
 ## 平台支持
