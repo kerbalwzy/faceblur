@@ -1,0 +1,92 @@
+{
+  "app": {
+    "title": "FaceBlur",
+    "tagline": "人脸模糊，素材不出浏览器",
+    "privacyBadge": "全部处理都在你的设备上完成，图片和视频不会上传",
+    "language": "语言",
+    "theme": "主题",
+    "themeAuto": "跟随系统",
+    "themeLight": "浅色",
+    "themeDark": "深色"
+  },
+  "upload": {
+    "title": "导入图片或视频",
+    "hint": "点击选择、拖拽到此处，或直接粘贴图片（Ctrl/⌘ + V）",
+    "formats": "图片支持 JPEG、PNG、WebP；视频支持 MP4、WebM、MOV",
+    "button": "选择图片",
+    "replacing": "选择其他图片",
+    "dropHere": "松手即可导入"
+  },
+  "stage": {
+    "loading": "正在加载检测引擎…",
+    "loadingRuntime": "加载推理运行时",
+    "loadingModel": "下载模型",
+    "loadingSession": "初始化会话",
+    "detecting": "正在检测人脸…",
+    "rendering": "正在导出…",
+    "noFace": "未检测到人脸",
+    "noFaceHint": "可以先检查图片是否清晰，或尝试提高检测灵敏度。"
+  },
+  "faces": {
+    "title": "检测到 {count} 张人脸",
+    "enabled": "已遮挡 {count} 张",
+    "toggleAll": "全部",
+    "toggleNone": "全不选",
+    "faceLabel": "人脸 {index}",
+    "confidence": "置信度 {value}%",
+    "toggle": "遮挡此脸"
+  },
+  "settings": {
+    "title": "遮挡设置",
+    "style": "样式",
+    "styleBlur": "高斯模糊",
+    "stylePixelate": "马赛克",
+    "styleSolid": "色块",
+    "strength": "强度",
+    "strengthLow": "弱",
+    "strengthHigh": "强",
+    "shape": "形状",
+    "shapeRounded": "圆角矩形",
+    "shapeEllipse": "椭圆",
+    "qualityTier": "检测精度",
+    "tierStandard": "标准（快）",
+    "tierHigh": "高精度（慢）",
+    "threshold": "检测灵敏度",
+    "thresholdHint": "调高可以找到更小的人脸，但可能误判背景"
+  },
+  "export": {
+    "button": "导出图片",
+    "format": "格式",
+    "quality": "质量",
+    "compare": "按住对比原图",
+    "done": "已导出"
+  },
+  "error": {
+    "title": "出了点问题",
+    "retry": "重试",
+    "reselect": "重新选择素材",
+    "unsupportedBrowser": "当前浏览器不支持所需功能",
+    "unsupportedHint": "请使用 Chrome 91+、Firefox 89+ 或 Safari 16.4+（iOS 请使用 Safari）",
+    "singleThread": "当前为单线程模式（未开启跨源隔离），处理速度会较慢",
+    "videoUnsupported": "该浏览器无法解码此视频，建议转码为 H.264 编码的 MP4 后重试"
+  },
+  "footer": {
+    "source": "检测模型",
+    "license": "许可证",
+    "notice": "检测模型 YuNet（OpenCV Zoo，MIT）· 推理运行时 onnxruntime-web（MIT）"
+  },
+  "video": {
+    "title": "视频",
+    "duration": "时长",
+    "resolution": "分辨率",
+    "frames": "约 {count} 帧",
+    "process": "开始处理视频",
+    "processing": "正在处理视频…",
+    "cancel": "取消处理",
+    "cancelled": "已取消",
+    "reexport": "重新处理",
+    "export": "下载视频",
+    "degraded": "当前为实时录制模式（浏览器不支持 WebCodecs），处理时间约等于视频时长",
+    "tooLong": "视频较长，处理可能需要较长时间"
+  }
+}

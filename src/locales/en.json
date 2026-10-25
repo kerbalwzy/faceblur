@@ -1,0 +1,92 @@
+{
+  "app": {
+    "title": "FaceBlur",
+    "tagline": "Blur faces without uploading your media",
+    "privacyBadge": "Everything runs on your device — photos and videos are never uploaded",
+    "language": "Language",
+    "theme": "Theme",
+    "themeAuto": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark"
+  },
+  "upload": {
+    "title": "Import an image or video",
+    "hint": "Click to choose, drag it here, or paste an image (Ctrl/⌘ + V)",
+    "formats": "Images: JPEG, PNG, WebP · Videos: MP4, WebM, MOV",
+    "button": "Choose image",
+    "replacing": "Choose another image",
+    "dropHere": "Drop to import"
+  },
+  "stage": {
+    "loading": "Loading the detection engine…",
+    "loadingRuntime": "Loading the inference runtime",
+    "loadingModel": "Downloading the model",
+    "loadingSession": "Creating the session",
+    "detecting": "Detecting faces…",
+    "rendering": "Exporting…",
+    "noFace": "No faces detected",
+    "noFaceHint": "Try a sharper image, or raise the detection sensitivity."
+  },
+  "faces": {
+    "title": "{count} face(s) detected",
+    "enabled": "{count} blurred",
+    "toggleAll": "All",
+    "toggleNone": "None",
+    "faceLabel": "Face {index}",
+    "confidence": "{value}% confidence",
+    "toggle": "Blur this face"
+  },
+  "settings": {
+    "title": "Blur settings",
+    "style": "Style",
+    "styleBlur": "Gaussian blur",
+    "stylePixelate": "Pixelate",
+    "styleSolid": "Solid",
+    "strength": "Strength",
+    "strengthLow": "Weak",
+    "strengthHigh": "Strong",
+    "shape": "Shape",
+    "shapeRounded": "Rounded",
+    "shapeEllipse": "Ellipse",
+    "qualityTier": "Detection quality",
+    "tierStandard": "Standard (fast)",
+    "tierHigh": "High (slower)",
+    "threshold": "Sensitivity",
+    "thresholdHint": "Higher finds smaller faces but may catch background"
+  },
+  "export": {
+    "button": "Export image",
+    "format": "Format",
+    "quality": "Quality",
+    "compare": "Hold to compare",
+    "done": "Exported"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "retry": "Retry",
+    "reselect": "Choose another file",
+    "unsupportedBrowser": "This browser is missing a required feature",
+    "unsupportedHint": "Please use Chrome 91+, Firefox 89+ or Safari 16.4+ (Safari on iOS)",
+    "singleThread": "Running in single-thread mode (no cross-origin isolation); processing will be slower",
+    "videoUnsupported": "This browser can't decode the video. Try converting it to H.264 MP4 first"
+  },
+  "footer": {
+    "source": "Detection model",
+    "license": "License",
+    "notice": "Face model YuNet (OpenCV Zoo, MIT) · inference runtime onnxruntime-web (MIT)"
+  },
+  "video": {
+    "title": "Video",
+    "duration": "Duration",
+    "resolution": "Resolution",
+    "frames": "~{count} frames",
+    "process": "Process video",
+    "processing": "Processing video…",
+    "cancel": "Cancel",
+    "cancelled": "Cancelled",
+    "reexport": "Process again",
+    "export": "Download video",
+    "degraded": "Real-time recording mode (WebCodecs unavailable); processing takes about as long as the video",
+    "tooLong": "This video is long and may take a while to process"
+  }
+}
